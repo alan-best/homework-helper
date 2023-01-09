@@ -15,6 +15,20 @@ jobs:
         run: npm i
       - name: build
         run: npm run build
+      - name: Archive artifact
+        shell: sh
+        run: |
+          chmod -c -R +rX "dist/"
+          tar \
+            --dereference --hard-dereference \
+            --directory "dist/" \
+            -cvf "$RUNNER_TEMP/artifact.tar" \
+            .
+      - name: Upload artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
   deploy:
     # Add a dependency to the build job
     needs: build
